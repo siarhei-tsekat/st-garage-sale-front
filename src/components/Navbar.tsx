@@ -12,7 +12,7 @@ const Navbar = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
   //const { cart } = useSelector((state) => state.carts);
   // const {username} = useAppSelector(state => state.auth);
-  const { username } = useAuthStore();
+  const { user } = useAuthStore();
   const cart = [];
 
   return (
@@ -58,7 +58,7 @@ const Navbar = () => {
             </Link>
           </li>
 
-          {username && (
+          {user && (
             <li className="font-[500] transition-all duration-150">
               <Link className={`${path === "/cart" ? "text-white font-semibold" : "text-gray-200"}`} to="/cart">
                 <Badge showZero badgeContent={cart?.length || 0} color="primary" overlap="circular" anchorOrigin={{ vertical: "top", horizontal: "right" }}>
@@ -68,7 +68,7 @@ const Navbar = () => {
             </li>
           )}
 
-          {username ? (
+          {user ? (
             <li className="font-[500] transition-all duration-150">
               <UserMenu />
             </li>

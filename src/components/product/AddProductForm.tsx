@@ -2,19 +2,21 @@ import { Button, IconButton } from "@mui/material";
 import { Upload, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useCreateProduct } from "../../service/useProductMutation";
 import InputField from "../shared/InputField";
 
 interface IFormInput {
-  username: string;
-  email: string;
-  password: string;
+  productname: string;
+  description: string;
+  price: string;
+  specialPrice: string;
+  quantity: string;
 }
 
 const AddProductForm: React.FC = () => {
   const [images, setImages] = useState<File[]>([]);
-  const [productName, setProductName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
+
+  const createProduct = useCreateProduct(() => successCallback());
 
   const {
     register,
@@ -23,6 +25,10 @@ const AddProductForm: React.FC = () => {
     formState: { errors },
   } = useForm<IFormInput>({ mode: "onTouched" });
 
+  const successCallback = () => {
+    reset();
+    setImages([]);
+  };
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const selectedFiles = Array.from(event.target.files).slice(0, 5 - images.length);
@@ -34,28 +40,18 @@ const AddProductForm: React.FC = () => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const onSubmit = async (data: IFormInput) => {};
-
-  const handleSubmitForm = (event: React.FormEvent) => {
-    event.preventDefault();
-    const formData = new FormData();
-    formData.append("productName", productName);
-    formData.append("description", description);
-    formData.append("price", price);
-    images.forEach((image, index) => {
-      formData.append(`image${index + 1}`, image);
-    });
-
-    console.log("Form Submitted", { productName, description, price, images });
-    // Here, you can make an API call to submit the formData
+  const onSubmit = async (data: IFormInput) => {
+    createProduct.mutate({ productName: data.productname, description: data.description, price: data.price, quantity: data.quantity, images: images });
   };
+
   return (
     <div className="max-w-2xl mx-auto p-6 m-12 bg-gray-700 shadow-md rounded-xl">
       <h2 className="text-2xl font-bold mb-4 text-slate-300 flex justify-center">Add Product</h2>
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        <InputField label="Product Name" required id="productname" type="text" message="* Product Name is required" placeholder="Enter your product name" register={register} errors={errors} />
-        <InputField label="Description" required id="description" type="text" message="* Description is required" placeholder="Enter your description" register={register} errors={errors} />
-        <InputField label="Price" required id="price" type="number" message="* Price is required" placeholder="Enter your price" register={register} errors={errors} />
+        <InputField label="Product Name" required id="productname" type="text" message="Product Name is required" placeholder="Enter your product name" register={register} errors={errors} />
+        <InputField label="Description" required id="description" type="text" message="Description is required" placeholder="Enter your description" register={register} errors={errors} />
+        <InputField label="Price" required id="price" type="number" message="Price is required" placeholder="Enter your price" register={register} errors={errors} defaultValue="0" />
+        <InputField label="Quantity" required id="quantity" type="number" message="Quantity is required" placeholder="Enter your quantity" register={register} errors={errors} defaultValue="1" />
 
         <div className="space-y-2">
           <label className="block text-sm font-medium text-slate-300">Upload Images (up to 5)</label>

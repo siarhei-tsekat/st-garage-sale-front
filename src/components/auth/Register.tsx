@@ -1,9 +1,7 @@
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { FaUserPlus } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-import useAuthStore from "../../store/authStore";
+import { Link } from "react-router-dom";
+import { useRegisterUser } from "../../service/useAuthMutations";
 import InputField from "../shared/InputField";
 import Spinner from "../shared/Spinner";
 
@@ -14,8 +12,8 @@ interface IFormInput {
 }
 
 const Register = () => {
-  const navigate = useNavigate();
-  const { status, error, isLoading, register: registerUser, resetState } = useAuthStore();
+  const regsiterUser = useRegisterUser(() => resetForm());
+
   const {
     register,
     handleSubmit,
@@ -23,20 +21,12 @@ const Register = () => {
     formState: { errors },
   } = useForm<IFormInput>({ mode: "onTouched" });
 
-  const onSubmit = async (data: IFormInput) => {
-    registerUser(data.username, data.password, data.email);
+  const resetForm = () => {
+    reset();
   };
-
-  useEffect(() => {
-    if (status === "succeeded") {
-      reset();
-      toast.success("User created. Redirecting to login page");
-      setTimeout(() => navigate("/login"), 1000);
-      resetState();
-    } else if (status === "failed") {
-      toast.error(error);
-    }
-  }, [error, status, toast, reset, navigate]);
+  const onSubmit = async (data: IFormInput) => {
+    regsiterUser.mutate({ username: data.username, password: data.password, email: data.email });
+  };
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex justify-center items-center  bg-gray-800 text-white">
@@ -49,11 +39,11 @@ const Register = () => {
         <div className="flex flex-col gap-3">
           <InputField label="User Name" required id="username" type="text" message="* User Name is required" placeholder="Enter your username" register={register} errors={errors} />
           <InputField label="Email" required id="email" type="email" message="* Email is required" placeholder="Enter your email" register={register} errors={errors} />
-          <InputField label="Password" required id="password" min={6} type="password" message="* Password is required" placeholder="Enter your password" register={register} errors={errors} />
+          <InputField label="Password" required id="password" minlenght={6} type="password" message="* Password is required" placeholder="Enter your password" register={register} errors={errors} />
         </div>
 
-        <button disabled={isLoading} className="bg-button-gradient flex gap-2 items-center justify-center font-semibold text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-sm my-3" type="submit">
-          {isLoading ? (
+        <button disabled={regsiterUser.isPending} className="bg-button-gradient flex gap-2 items-center justify-center font-semibold text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-sm my-3" type="submit">
+          {regsiterUser.isPending ? (
             <>
               <Spinner /> Loading...
             </>

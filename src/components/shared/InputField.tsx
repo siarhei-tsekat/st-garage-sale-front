@@ -6,27 +6,29 @@ interface InputFieldProps {
   register: any;
   required: any;
   message: string;
-  min?: number;
+  minlenght?: number;
   placeholder: string;
   className?: string;
+  defaultValue?: string;
 }
 
 const InputField = (props: InputFieldProps) => {
-  const { label, id, type, errors, register, required, message, min, placeholder, className } = props;
+  const { label, id, type, errors, register, required, message, minlenght, placeholder, className, defaultValue } = props;
 
   return (
     <div className="flex flex-col gap-1 w-full">
-      <label htmlFor="id" className={`${className ? className : ""} font-semibold text-sm text-slate-300`}>
+      <label htmlFor={id} className={`${className ? className : ""} font-semibold text-sm text-slate-300`}>
         {label}
       </label>
       <input
         type={type}
+        defaultValue={defaultValue}
         id={id}
         placeholder={placeholder}
         className={`${className ? className : ""} px-2 py-2 border outline-none bg-transparent text-slate-300 rounded-md ${errors[id]?.message ? "border-red-400" : "border-slate-300"}`}
         {...register(id, {
-          required: { value: required, message },
-          minLength: min ? { value: min, message: `Minimum ${min} character is required` } : null,
+          required: { value: required, message},
+          minLength: minlenght ? { value: minlenght, message: `Minimum ${minlenght} character is required` } : null,
           pattern:
             type === "email"
               ? {

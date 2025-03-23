@@ -2,13 +2,13 @@ import { Navigate, Outlet } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 
 const PrivateRoute = ({ publicPage = false }: { publicPage?: boolean }) => {
-  const { username } = useAuthStore();
+  const { user } = useAuthStore();
 
   if (publicPage) {
-    return username ? <Navigate to="/" /> : <Outlet />;
+    return user ? <Navigate to="/" /> : <Outlet />;
   }
 
-  return username ? <Outlet /> : <Navigate to="/login" />;
+  return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;

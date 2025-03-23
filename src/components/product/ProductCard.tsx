@@ -7,17 +7,18 @@ interface ProductCardParams {
   price: number;
   specialPrice?: number;
   quantity: number;
-  image: string;
+  images: string[];
   about?: boolean;
 }
 
-const ProductCard = ({ productName, image, description, price, specialPrice, quantity, about = false }: ProductCardParams) => {
+const ProductCard = ({ productName, images, description, price, specialPrice, quantity, about = false }: ProductCardParams) => {
   const isAvailable = quantity && Number(quantity) > 0;
   const btnLoader = false;
+  
   return (
     <div className="border rounded-lg shadow-xl  border-gray-500 overflow-hidden transition-shadow duration-300">
       <div onClick={() => {}} className="w-full overflow-hidden aspect-[3/2]">
-        <img className="w-full h-full cursor-pointer transition-transform duration-300 transform hover:scale-105" src={image} alt={productName}></img>
+        <img className="w-full h-full cursor-pointer transition-transform duration-300 transform hover:scale-105" src={`data:image/png;base64;${images[0]}`} alt={productName}></img>
       </div>
       <div className="p-4">
         <h2 onClick={() => {}} className="text-lg font-semibold mb-2 cursor-pointer text-gray-200">

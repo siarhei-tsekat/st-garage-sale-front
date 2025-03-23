@@ -1,10 +1,8 @@
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlineLogin } from "react-icons/ai";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useLoginUser } from "../../service/useAuthMutations";
 import InputField from "../shared/InputField";
-import toast from "react-hot-toast";
-import useAuthStore from "../../store/authStore";
 import Spinner from "../shared/Spinner";
 
 interface IFormInput {
@@ -13,8 +11,7 @@ interface IFormInput {
 }
 
 const LogIn = () => {
-  const navigate = useNavigate();
-  const { isLoading, login, isAuthenticated, error, jwtToken, username } = useAuthStore();
+  const loginUser = useLoginUser(() => reset());
 
   const {
     register,
@@ -24,23 +21,8 @@ const LogIn = () => {
   } = useForm<IFormInput>({ mode: "onTouched" });
 
   const loginHandler = async (data: IFormInput) => {
-    login(data.username, data.password);
+    loginUser.mutate({ username: data.username, password: data.password });
   };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      localStorage.setItem("jwt", jwtToken || "");
-      localStorage.setItem("isAuthenticated", isAuthenticated ? "true" : "false");
-      localStorage.setItem("username", username || "");
-      reset();
-      navigate("/profile");
-      toast.success("Login successfull.");
-    } 
-    if (error) {
-      reset();
-      toast.error(error);
-    }
-  }, [isAuthenticated, navigate, error]);
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex justify-center items-center  bg-gray-800 text-white">
@@ -56,8 +38,8 @@ const LogIn = () => {
           <InputField label="Password" required id="password" type="password" message="* Password is required" placeholder="Enter your password" register={register} errors={errors} />
         </div>
 
-        <button disabled={isLoading} className="bg-button-gradient flex gap-2 items-center justify-center font-semibold text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-sm my-3" type="submit">
-          {isLoading ? (
+        <button disabled={loginUser.isPending} className="bg-button-gradient flex gap-2 items-center justify-center font-semibold text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-sm my-3" type="submit">
+          {loginUser.isPending ? (
             <>
               <Spinner />
               Loading...
