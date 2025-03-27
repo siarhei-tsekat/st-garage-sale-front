@@ -1,7 +1,20 @@
 import { FaShoppingCart } from "react-icons/fa";
 import truncateText from "../utils";
+import ProductViewModal from "./ProductViewModal";
+import { useState } from "react";
+
+export interface Product {
+  productId: string;
+  productName: string;
+  description: string;
+  price: number;
+  specialPrice?: number;
+  quantity: number;
+  images: string[];
+}
 
 interface ProductCardParams {
+  productId: string;
   productName: string;
   description: string;
   price: number;
@@ -11,13 +24,34 @@ interface ProductCardParams {
   about?: boolean;
 }
 
-const ProductCard = ({ productName, images, description, price, specialPrice, quantity, about = false }: ProductCardParams) => {
-  const isAvailable = quantity && Number(quantity) > 0;
+const ProductCard = ({ productId, productName, images, description, price, specialPrice, quantity, about = false }: ProductCardParams) => {
+  const [openProductViewModal, setOpenProductViewModal] = useState(false);
+  const [selectedViewProduct, setSelectedViewProduct] = useState<Product | null>(null);
+  const isAvailable: boolean = quantity && Number(quantity) > 0 || false;
   const btnLoader = false;
-  
+
+  const handleProductView = (product: any) => {
+    if (!about) {
+      setSelectedViewProduct(product);
+      setOpenProductViewModal(true);
+    }
+  };
   return (
     <div className="border rounded-lg shadow-xl  border-gray-500 overflow-hidden transition-shadow duration-300">
-      <div onClick={() => {}} className="w-full overflow-hidden aspect-[3/2]">
+      <div
+        onClick={() => {
+          handleProductView({
+            id: productId,
+            productName,
+            images,
+            description,
+            quantity,
+            price,
+            specialPrice,
+          });
+        }}
+        className="w-full overflow-hidden aspect-[3/2]"
+      >
         <img className="w-full h-full cursor-pointer transition-transform duration-300 transform hover:scale-105" src={`data:image/png;base64;${images[0]}`} alt={productName}></img>
       </div>
       <div className="p-4">
@@ -54,7 +88,7 @@ const ProductCard = ({ productName, images, description, price, specialPrice, qu
           </div>
         )}
       </div>
-      {/* <ProductViewModal open={openProductViewModal} setOpen={setOpenProductViewModal} product={selectedViewProduct} isAvailable={isAvailable} /> */}
+      {selectedViewProduct && <ProductViewModal open={openProductViewModal} setOpen={setOpenProductViewModal} product={selectedViewProduct} isAvailable={isAvailable}/>}
     </div>
   );
 };

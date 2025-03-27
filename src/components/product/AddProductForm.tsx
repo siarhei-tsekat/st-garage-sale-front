@@ -5,6 +5,10 @@ import { useForm } from "react-hook-form";
 import { useCreateProduct } from "../../service/useProductMutation";
 import InputField from "../shared/InputField";
 
+interface AppProductParams {
+  onProductAddedListener?: () => void;
+}
+
 interface IFormInput {
   productname: string;
   description: string;
@@ -13,7 +17,7 @@ interface IFormInput {
   quantity: string;
 }
 
-const AddProductForm: React.FC = () => {
+const AddProductForm = (params: AppProductParams) => {
   const [images, setImages] = useState<File[]>([]);
 
   const createProduct = useCreateProduct(() => successCallback());
@@ -41,7 +45,11 @@ const AddProductForm: React.FC = () => {
   };
 
   const onSubmit = async (data: IFormInput) => {
-    createProduct.mutate({ productName: data.productname, description: data.description, price: data.price, quantity: data.quantity, images: images });
+    createProduct.mutate({ productName: data.productname, description: data.description, price: data.price, quantity: data.quantity, images: images }, {
+      onSuccess: () => {
+        if (params.onProductAddedListener) params.onProductAddedListener();
+      },
+    });
   };
 
   return (

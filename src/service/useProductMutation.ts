@@ -29,5 +29,7 @@ export const useAllUseProducts = () => {
           return (await getAllUserProducts()).payload.products;
         
       },
+      enabled: false
     });
-  };
+};
+  

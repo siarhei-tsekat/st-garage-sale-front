@@ -62,3 +62,12 @@ export const getAllUserProducts = async (): Promise<ApiResponse<UserProducts>> =
 
   return response.data;
 };
+
+export const deleteProduct = async (productId: number): Promise<void> => {
+  const user = useAuthStore.getState().user;
+  await api.delete(`/me/product/${productId}`, {
+    headers: {
+      Authorization: `Bearer ${user?.jwtToken}`,
+    },
+  });
+};
